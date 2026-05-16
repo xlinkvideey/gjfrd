@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>megadonald</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,body{
+  width:100%;
+  min-height:100%;
+  background:#fff;
+  color:#111;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* HEADER */
+
+.main-header{
+  width:100%;
+  background:#fff;
+  border-bottom:1px solid #eee;
+  position:sticky;
+  top:0;
+  z-index:999;
+}
+
+.header-container{
+  max-width:1200px;
+  margin:auto;
+  padding:12px 15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.header-title{
+  font-size:28px;
+  font-weight:700;
+  color:#111;
+  text-decoration:none;
+}
+
+.header-upload-btn{
+  background:#f1f1f1;
+  padding:8px 15px;
+  border-radius:14px;
+  text-decoration:none;
+  color:#111;
+  font-size:14px;
+  font-weight:600;
+}
+
+/* VIDEO */
+
+.video-player-wrap{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px 10px;
+}
+
+.player-row{
+  display:flex;
+  justify-content:center;
+  width:100%;
+}
+
+.video-box{
+  width:800px;
+  max-width:100%;
+  aspect-ratio:16/9;
+  background:#000;
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+}
+
+.video-box video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.video-click-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  z-index:5;
+}
+
+#video-error{
+  display:none;
+  color:#fff;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;
+  font-size:18px;
+}
+
+/* BUTTON */
+
+.video-actions{
+  display:flex;
+  justify-content:center;
+  margin-top:15px;
+}
+
+.download-btn{
+  background:linear-gradient(90deg,#667eea,#764ba2);
+  color:#fff;
+  padding:12px 25px;
+  border-radius:30px;
+  text-decoration:none;
+  font-size:18px;
+  font-weight:700;
+}
+
+/* FOOTER */
+
+footer{
+  margin:25px 0;
+  text-align:center;
+  color:gray;
+  font-size:14px;
+}
+
+/* FLOAT BANNER */
+
+#donmeg{
+  position:fixed;
+  left:0;
+  bottom:0;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  z-index:9999;
+}
+
+#donmeg iframe,
+#donmeg img{
+  max-width:100%;
+  height:auto;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  .header-title{
+    font-size:22px;
+  }
+
+  .video-box{
+    width:100%;
+    border-radius:8px;
+  }
+
+  body{
+    padding-bottom:280px;
+  }
+
+  .video-actions{
+    position:sticky;
+    bottom:10px;
+    z-index:999;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<header class="main-header">
+  <div class="header-container">
+    <div class="header-left">
+      <a href="/" class="header-title">Videy</a>
+
+      <a class="header-upload-btn" href="/">
+        Upload
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="video-player-wrap">
+
+  <div class="player-row">
+
+    <div class="video-box">
+
+      <video
+        id="video"
+        controls
+        controlsList="nodownload noplaybackrate"
+        oncontextmenu="return false;"
+        playsinline>
+      </video>
+
+      <button
+        type="button"
+        class="video-click-layer"
+        id="firstClickLayer">
+      </button>
+
+      <div id="video-error">
+        Video tidak tersedia
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="video-actions">
+    <a id="downloadBtn" class="download-btn" href="#">
+      DOWNLOAD
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  Copyright © 2026<br>
+  <a href="#">Terms of Service</a> •
+  <a href="#">Report Abuse</a>
+</footer>
+
+<script>
+const adLink = atob("aHR0cHM6Ly9ia3pkaWt6eG1nLmJsb2dzcG90LmNvbS8yMDI1LzEwL2J1bGxlLmh0bWw");
+
+document.getElementById("downloadBtn").onclick = function(e){
+  e.preventDefault();
+  window.location.href = adLink;
+};
+
+const video = document.getElementById("video");
+const videoError = document.getElementById("video-error");
+const videoActions = document.querySelector(".video-actions");
+const clickLayer = document.getElementById("firstClickLayer");
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+if(!id){
+
+  setTimeout(() => {
+    window.location.href = adLink;
+  }, 2000);
+
+}else{
+
+  const base = "https://cdn2.videy.co/" + id;
+
+  function loadVideo(src){
+    video.src = src;
+    video.load();
+  }
+
+  loadVideo(base + ".mp4");
+
+  video.onerror = function(){
+
+    if(!video.dataset.triedMov){
+
+      video.dataset.triedMov = "1";
+      loadVideo(base + ".mov");
+
+    }else{
+
+      video.style.display = "none";
+      videoError.style.display = "block";
+      videoActions.style.display = "none";
+
+      if(clickLayer){
+        clickLayer.style.display = "none";
+      }
+
+    }
+
+  };
+
+}
+
+(function(){
+
+  const directLink = "#";
+
+  if(!directLink || directLink === "#"){
+    clickLayer.remove();
+    return;
+  }
+
+  clickLayer.addEventListener("click", function(e){
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    window.open(directLink, "_blank");
+
+    clickLayer.remove();
+
+  }, {once:true});
+
+})();
+</script>
+
+<script src="https://pl27575074.profitablecpmratenetwork.com/86/b0/31/86b031edbed52dfaee0ffbd0f3170f9d.js"></script>
+
+<div id="donmeg">
+
+<script>
+atOptions = {
+  'key' : '668912fc9dc8ba6ba14a7fac182d4a20',
+  'format' : 'iframe',
+  'height' : 250,
+  'width' : 300,
+  'params' : {}
+};
+</script>
+
+<script src="https://www.highperformanceformat.com/668912fc9dc8ba6ba14a7fac182d4a20/invoke.js"></script>
+
+</div>
+
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,5026796,4,9,110,60,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?5026796&101" alt="" border="0"></a></noscript>
+
+</body>
+</html>
